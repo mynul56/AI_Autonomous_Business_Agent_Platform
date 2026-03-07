@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { OrganizationProvider } from "@/hooks/use-organization";
 import { AgentProvider } from "@/hooks/use-agents";
+import { TeamProvider } from "@/hooks/use-team";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
       >
         <OrganizationProvider>
           <AgentProvider>
-            {children}
+            <TeamProvider>
+              {children}
+            </TeamProvider>
           </AgentProvider>
         </OrganizationProvider>
       </body>
