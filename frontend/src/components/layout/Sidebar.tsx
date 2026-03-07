@@ -18,6 +18,8 @@ import {
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
+import { OrganizationSwitcher } from "./OrganizationSwitcher";
+
 const sidebarItems = [
     { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
     { name: "AI Agents", href: "/dashboard/agents", icon: Bot },
@@ -51,6 +53,8 @@ export function Sidebar() {
                     </span>
                 )}
             </div>
+
+            {!collapsed && <OrganizationSwitcher />}
 
             <nav className="flex-1 w-full px-3 space-y-1">
                 {sidebarItems.map((item) => {
