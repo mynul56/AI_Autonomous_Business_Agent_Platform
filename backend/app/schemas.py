@@ -91,3 +91,21 @@ class Conversation(ConversationBase):
 
     class Config:
         from_attributes = True
+
+class WorkflowBase(BaseModel):
+    title: str
+    trigger: str
+    action: str
+    color: str = "bg-blue-500"
+
+class WorkflowCreate(WorkflowBase):
+    organization_id: UUID
+
+class Workflow(WorkflowBase):
+    id: UUID
+    last_triggered: Optional[str] = None
+    organization_id: UUID
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

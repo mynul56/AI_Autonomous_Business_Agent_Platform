@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import organizations, agents, knowledge, conversations, users
+from .routers import organizations, agents, knowledge, conversations, users, members, workflows
 
 app = FastAPI(title="AI Autonomous Business Agent Platform")
 
@@ -19,6 +19,8 @@ app.include_router(agents.router)
 app.include_router(knowledge.router)
 app.include_router(conversations.router)
 app.include_router(users.router)
+app.include_router(members.router)
+app.include_router(workflows.router)
 
 @app.get("/health")
 def health_check():

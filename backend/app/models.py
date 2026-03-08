@@ -31,6 +31,7 @@ class Organization(Base):
     agents = relationship("Agent", back_populates="organization")
     knowledge_items = relationship("KnowledgeItem", back_populates="organization")
     conversations = relationship("Conversation", back_populates="organization")
+    workflows = relationship("Workflow", back_populates="organization")
 
 class Agent(Base):
     __tablename__ = "agents"
@@ -71,6 +72,20 @@ class Conversation(Base):
 
     agent = relationship("Agent", back_populates="conversations")
     organization = relationship("Organization", back_populates="conversations")
+
+class Workflow(Base):
+    __tablename__ = "workflows"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String, nullable=False)
+    trigger = Column(String, nullable=False)
+    action = Column(String, nullable=False)
+    color = Column(String, default="bg-blue-500")
+    last_triggered = Column(String, nullable=True)
+    organization_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    organization = relationship("Organization", back_populates="workflows")
 
 class Membership(Base):
     __tablename__ = "memberships"
