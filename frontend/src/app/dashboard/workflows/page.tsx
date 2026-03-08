@@ -1,9 +1,15 @@
 "use client";
 
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Workflow, Play, Settings2, ArrowRight } from "lucide-react";
+import { Workflow, Play, Settings2, ArrowRight, Trash2 } from "lucide-react";
+import { useWorkflows } from "@/hooks/use-workflows";
+import { CreateWorkflowModal } from "@/components/workflows/CreateWorkflowModal";
+import React from "react";
 
 export default function WorkflowsPage() {
+    const { workflows, deleteWorkflow } = useWorkflows();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
+
     return (
         <DashboardLayout>
             <div className="space-y-8">
@@ -12,27 +18,35 @@ export default function WorkflowsPage() {
                         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Workflows</h1>
                         <p className="text-slate-500 mt-2">Automate business processes with AI-triggered rules.</p>
                     </div>
-                    <button className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all"
+                    >
                         New Automation
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {[
-                        { title: "Lead Follow-up", trigger: "Message Received", action: "Send Email", color: "bg-blue-500" },
-                        { title: "Support Escalation", trigger: "Unresolved Query", action: "Alert Slack", color: "bg-red-500" },
-                    ].map((flow) => (
-                        <div key={flow.title} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    {workflows.map((flow) => (
+                        <div key={flow.id} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm relative group">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${flow.color} text-white`}>
+                                    <div className={`p-2 rounded-lg ${flow.color || 'bg-indigo-500'} text-white`}>
                                         <Workflow className="w-5 h-5" />
                                     </div>
                                     <h3 className="font-bold text-slate-900 dark:text-white">{flow.title}</h3>
                                 </div>
-                                <button className="p-2 hover:bg-slate-100 rounded-lg">
-                                    <Settings2 className="w-4 h-4 text-slate-400" />
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => deleteWorkflow(flow.id)}
+                                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                    <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <Settings2 className="w-4 h-4 text-slate-400" />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-3 text-sm">
@@ -42,7 +56,7 @@ export default function WorkflowsPage() {
                             </div>
 
                             <div className="mt-6 pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
-                                <p className="text-xs text-slate-400 font-medium">Last triggered: 1 hour ago</p>
+                                <p className="text-xs text-slate-400 font-medium">Last triggered: {flow.last_triggered || "Never"}</p>
                                 <div className="flex gap-2">
                                     <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg">
                                         <Play className="w-4 h-4" />
@@ -51,8 +65,18 @@ export default function WorkflowsPage() {
                             </div>
                         </div>
                     ))}
+                    {workflows.length === 0 && (
+                        <div className="col-span-full py-20 text-center text-slate-500">
+                            No automations configured yet. Create one to get started.
+                        </div>
+                    )}
                 </div>
             </div>
+
+            <CreateWorkflowModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </DashboardLayout>
     );
 }

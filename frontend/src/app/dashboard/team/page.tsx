@@ -106,7 +106,11 @@ export default function TeamPage() {
                     <td className="px-6 py-5 text-right">
                       {member.role !== 'Owner' && (
                         <button
-                          onClick={() => removeMember(member.id)}
+                          onClick={async () => {
+                            if (confirm("Remove this member?")) {
+                              await removeMember(member.id);
+                            }
+                          }}
                           className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                           title="Remove Member"
                         >

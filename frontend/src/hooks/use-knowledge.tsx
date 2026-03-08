@@ -14,7 +14,7 @@ export interface KnowledgeItem {
 
 interface KnowledgeContextType {
     items: KnowledgeItem[];
-    addItem: (item: Omit<KnowledgeItem, "id" | "createdAt">) => Promise<void>;
+    addItem: (item: Omit<KnowledgeItem, "id" | "createdAt" | "organization_id">) => Promise<void>;
     removeItem: (id: string) => Promise<void>;
 }
 
@@ -41,7 +41,7 @@ export function KnowledgeProvider({ children }: { children: React.ReactNode }) {
         fetchItems();
     }, [activeOrg]);
 
-    const addItem = async (itemData: Omit<KnowledgeItem, "id" | "createdAt">) => {
+    const addItem = async (itemData: Omit<KnowledgeItem, "id" | "createdAt" | "organization_id">) => {
         if (!activeOrg) return;
         try {
             const response = await fetch("http://localhost:8000/knowledge/", {

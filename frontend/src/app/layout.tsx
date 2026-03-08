@@ -6,6 +6,7 @@ import { AgentProvider } from "@/hooks/use-agents";
 import { TeamProvider } from "@/hooks/use-team";
 import { KnowledgeProvider } from "@/hooks/use-knowledge";
 import { ConversationProvider } from "@/hooks/use-conversations";
+import { WorkflowProvider } from "@/hooks/use-workflows";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,9 @@ export default function RootLayout({
             <TeamProvider>
               <KnowledgeProvider>
                 <ConversationProvider>
-                  {children}
+                  <WorkflowProvider>
+                    {children}
+                  </WorkflowProvider>
                 </ConversationProvider>
               </KnowledgeProvider>
             </TeamProvider>

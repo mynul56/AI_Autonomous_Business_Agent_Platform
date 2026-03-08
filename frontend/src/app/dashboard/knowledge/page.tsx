@@ -3,9 +3,12 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Database, FileUp, Globe, Link2 } from "lucide-react";
 import { useKnowledge } from "@/hooks/use-knowledge";
+import { AddKnowledgeModal } from "@/components/knowledge/AddKnowledgeModal";
+import React from "react";
 
 export default function KnowledgePage() {
     const { items, removeItem } = useKnowledge();
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
     return (
         <DashboardLayout>
@@ -16,11 +19,17 @@ export default function KnowledgePage() {
                         <p className="text-slate-500 mt-2">Train your agents with your documents, websites, and data sources.</p>
                     </div>
                     <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-800 font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-800 font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                        >
                             <Globe className="w-4 h-4" />
                             Add URL
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 dark:shadow-none"
+                        >
                             <FileUp className="w-4 h-4" />
                             Upload Files
                         </button>
@@ -52,6 +61,11 @@ export default function KnowledgePage() {
                     )}
                 </div>
             </div>
+
+            <AddKnowledgeModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
         </DashboardLayout>
     );
 }
