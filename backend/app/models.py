@@ -16,7 +16,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    organizations = relationship("Membership", back_populates="user")
+    memberships = relationship("Membership", back_populates="user")
 
 class Organization(Base):
     __tablename__ = "organizations"

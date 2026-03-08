@@ -8,7 +8,7 @@ app = FastAPI(title="AI Autonomous Business Agent Platform")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, this should be restricted
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

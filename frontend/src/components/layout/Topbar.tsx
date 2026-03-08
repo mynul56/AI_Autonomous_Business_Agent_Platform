@@ -15,6 +15,22 @@ const INITIAL_NOTIFICATIONS = [
 export function Topbar() {
     const [isNotifOpen, setIsNotifOpen] = React.useState(false);
     const [notifications, setNotifications] = React.useState(INITIAL_NOTIFICATIONS);
+    const [userName, setUserName] = React.useState("John Doe");
+
+    React.useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me");
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.full_name) setUserName(data.full_name);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user for topbar:", error);
+            }
+        };
+        fetchUser();
+    }, []);
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -115,7 +131,7 @@ export function Topbar() {
 
                 <Link href="/dashboard/settings" className="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-xl transition-all">
                     <div className="text-right hidden sm:block">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">John Doe</p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{userName}</p>
                         <p className="text-xs text-slate-500">ACME Corp (Admin)</p>
                     </div>
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white border-2 border-white dark:border-slate-900 shadow-sm">

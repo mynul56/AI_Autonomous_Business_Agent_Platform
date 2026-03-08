@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Sparkles, Users, MessageSquare, Bot, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,11 +13,31 @@ const stats = [
 ];
 
 export default function DashboardPage() {
+    const [firstName, setFirstName] = React.useState("John");
+
+    React.useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me");
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.full_name) {
+                        const [first] = data.full_name.split(" ");
+                        setFirstName(first);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch user for dashboard:", error);
+            }
+        };
+        fetchUser();
+    }, []);
+
     return (
         <DashboardLayout>
             <div className="space-y-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome back, John!</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome back, {firstName}!</h1>
                     <p className="text-slate-500 mt-2">Here is what is happening with your AI agents today.</p>
                 </div>
 

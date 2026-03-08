@@ -83,6 +83,7 @@ export default function SettingsPage() {
                 body: JSON.stringify({
                     email: profile.email,
                     full_name: `${profile.firstName} ${profile.lastName}`.trim(),
+                    description: profile.description,
                     password: "dummy_password" // Not used but required by schema
                 }),
             });
