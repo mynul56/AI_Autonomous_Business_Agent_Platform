@@ -36,6 +36,35 @@ export default function SettingsPage() {
     const [isSaved, setIsSaved] = React.useState(false);
 
     // States for functional logic
+    const [profile, setProfile] = React.useState({
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+        description: "Administrator at ACME Corp managing AI integrations.",
+    });
+
+    React.useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch("http://localhost:8000/users/me");
+                if (response.ok) {
+                    const data = await response.json();
+                    const fullName = data.full_name || "";
+                    const [first, ...last] = fullName.split(" ");
+                    setProfile({
+                        firstName: first || "",
+                        lastName: last.join(" ") || "",
+                        email: data.email || "",
+                        description: data.description || "",
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+            }
+        };
+        fetchProfile();
+    }, []);
+
     const [twoFactor, setTwoFactor] = React.useState(true);
     const [notifPreferences, setNotifPreferences] = React.useState({
         email_leads: true,
@@ -44,14 +73,28 @@ export default function SettingsPage() {
         app_security: true,
     });
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
-        setTimeout(() => {
+        try {
+            const response = await fetch("http://localhost:8000/users/me", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: profile.email,
+                    full_name: `${profile.firstName} ${profile.lastName}`.trim(),
+                    password: "dummy_password" // Not used but required by schema
+                }),
+            });
+            if (response.ok) {
+                setIsSaved(true);
+                setTimeout(() => setIsSaved(false), 2000);
+            }
+        } catch (error) {
+            console.error("Failed to save profile:", error);
+        } finally {
             setIsSaving(false);
-            setIsSaved(true);
-            setTimeout(() => setIsSaved(false), 2000);
-        }, 800);
+        }
     };
 
     const toggleNotif = (key: keyof typeof notifPreferences) => {
@@ -108,22 +151,42 @@ export default function SettingsPage() {
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-bold text-slate-500 uppercase">First Name</label>
-                                                    <input type="text" defaultValue="John" className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all" />
+                                                    <input
+                                                        type="text"
+                                                        value={profile.firstName}
+                                                        onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+                                                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all"
+                                                    />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-bold text-slate-500 uppercase">Last Name</label>
-                                                    <input type="text" defaultValue="Doe" className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all" />
+                                                    <input
+                                                        type="text"
+                                                        value={profile.lastName}
+                                                        onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+                                                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all"
+                                                    />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase">Email Address</label>
-                                                <input type="email" defaultValue="john@example.com" className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all" />
+                                                <input
+                                                    type="email"
+                                                    value={profile.email}
+                                                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                                                    className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all"
+                                                />
                                             </div>
 
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase">Description</label>
-                                                <textarea rows={3} defaultValue="Administrator at ACME Corp managing AI integrations." className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all resize-none" />
+                                                <textarea
+                                                    rows={3}
+                                                    value={profile.description}
+                                                    onChange={(e) => setProfile({ ...profile, description: e.target.value })}
+                                                    className="w-full p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all resize-none"
+                                                />
                                             </div>
                                         </div>
 

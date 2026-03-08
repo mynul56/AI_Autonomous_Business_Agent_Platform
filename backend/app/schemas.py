@@ -5,12 +5,15 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     email: EmailStr
+    full_name: Optional[str] = None
+    description: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
 
 class User(UserBase):
     id: UUID
+    is_active: bool
     created_at: datetime
 
     class Config:
@@ -18,13 +21,13 @@ class User(UserBase):
 
 class OrganizationBase(BaseModel):
     name: str
+    slug: str
 
 class OrganizationCreate(OrganizationBase):
     pass
 
 class Organization(OrganizationBase):
     id: UUID
-    owner_id: UUID
     created_at: datetime
 
     class Config:

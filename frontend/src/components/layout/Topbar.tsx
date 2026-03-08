@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Bell, Search, User, X, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -112,7 +113,7 @@ export function Topbar() {
 
                 <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
 
-                <div className="flex items-center gap-3">
+                <Link href="/dashboard/settings" className="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-xl transition-all">
                     <div className="text-right hidden sm:block">
                         <p className="text-sm font-semibold text-slate-900 dark:text-white">John Doe</p>
                         <p className="text-xs text-slate-500">ACME Corp (Admin)</p>
@@ -120,7 +121,7 @@ export function Topbar() {
                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white border-2 border-white dark:border-slate-900 shadow-sm">
                         <User className="w-6 h-6" />
                     </div>
-                </div>
+                </Link>
             </div>
         </header>
     );
