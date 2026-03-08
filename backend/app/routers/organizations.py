@@ -19,12 +19,19 @@ def create_organization(org: schemas.OrganizationCreate, db: Session = Depends(g
     user = db.query(models.User).first()
     if not user:
         # Create a dummy user if none exists (just for development bootstrap)
-        user = models.User(email="admin@example.com")
+        user = models.User(
+            email="admin@example.com",
+            full_name="Admin",
+            hashed_password="hashed_password", # Satisfy non-nullable
+            is_active=True
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
 
-    db_org = models.Organization(name=org.name, owner_id=user.id)
+    # Simple slug generation
+    slug = org.name.lower().replace(" ", "-")
+    db_org = models.Organization(name=org.name, slug=slug, owner_id=user.id)
     db.add(db_org)
     db.commit()
     db.refresh(db_org)
