@@ -24,6 +24,49 @@ class Organization(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     memberships = relationship("Membership", back_populates="organization")
+    agents = relationship("Agent", back_populates="organization")
+    knowledge_items = relationship("KnowledgeItem", back_populates="organization")
+    conversations = relationship("Conversation", back_populates="organization")
+
+class Agent(Base):
+    __tablename__ = "agents"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    prompt = Column(String, nullable=False)
+    status = Column(String, default="Idle") # Active, Idle
+    organization_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    organization = relationship("Organization", back_populates="agents")
+    conversations = relationship("Conversation", back_populates="agent")
+
+class KnowledgeItem(Base):
+    __tablename__ = "knowledge_items"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False)
+    type = Column(String, nullable=False) # PDF, URL, DOCX
+    size = Column(String, nullable=True)
+    organization_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    organization = relationship("Organization", back_populates="knowledge_items")
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    visitor_id = Column(String, nullable=False)
+    agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False)
+    last_message = Column(String, nullable=True)
+    status = Column(String, default="Active") # Active, Closed
+    organization_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    agent = relationship("Agent", back_populates="conversations")
+    organization = relationship("Organization", back_populates="conversations")
 
 class Membership(Base):
     __tablename__ = "memberships"

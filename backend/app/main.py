@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import organizations
+from .routers import organizations, agents, knowledge, conversations
 
 app = FastAPI(title="AI Autonomous Business Agent Platform")
 
@@ -15,6 +15,9 @@ app.add_middleware(
 )
 
 app.include_router(organizations.router)
+app.include_router(agents.router)
+app.include_router(knowledge.router)
+app.include_router(conversations.router)
 
 @app.get("/health")
 def health_check():

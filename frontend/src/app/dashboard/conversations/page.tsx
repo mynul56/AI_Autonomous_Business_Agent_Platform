@@ -2,8 +2,11 @@
 
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MessageSquare, Calendar, Filter } from "lucide-react";
+import { useConversations } from "@/hooks/use-conversations";
 
 export default function ConversationsPage() {
+    const { conversations } = useConversations();
+
     return (
         <DashboardLayout>
             <div className="space-y-8">
@@ -22,28 +25,33 @@ export default function ConversationsPage() {
                                 <Calendar className="w-3 h-3" /> Date Range
                             </button>
                         </div>
-                        <p className="text-xs text-slate-400 font-medium">Total: 42 conversations today</p>
+                        <p className="text-xs text-slate-400 font-medium">Total: {conversations.length} conversations</p>
                     </div>
 
                     <div className="divide-y divide-slate-50 dark:divide-slate-800">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 cursor-pointer transition-all flex items-center gap-4">
+                        {conversations.map((conv) => (
+                            <div key={conv.id} className="p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 cursor-pointer transition-all flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600">
                                     <MessageSquare className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex justify-between items-center mb-1">
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Visitor #9482</p>
-                                        <span className="text-[10px] text-slate-400">14:32</span>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">Visitor {conv.visitor_id}</p>
+                                        <span className="text-[10px] text-slate-400">{new Date(conv.created_at).toLocaleTimeString()}</span>
                                     </div>
-                                    <p className="text-xs text-slate-500 truncate max-w-md">"How much does the enterprise plan cost?"</p>
+                                    <p className="text-xs text-slate-500 truncate max-w-md">"{conv.last_message || "No messages yet"}"</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Replied by Sales Bot</span>
+                                    <span className={`w-2 h-2 rounded-full ${conv.status === 'Active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{conv.status}</span>
                                 </div>
                             </div>
                         ))}
+                        {conversations.length === 0 && (
+                            <div className="p-10 text-center text-slate-500 text-sm">
+                                No conversations found.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

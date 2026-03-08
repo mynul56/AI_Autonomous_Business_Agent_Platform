@@ -17,17 +17,43 @@ interface OrganizationContextType {
 const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined);
 
 export function OrganizationProvider({ children }: { children: React.ReactNode }) {
-    const [organizations, setOrganizations] = useState<Organization[]>([
-        { id: "1", name: "ACME Corp" },
-        { id: "2", name: "Stark Industries" },
-    ]);
-    const [activeOrg, setActiveOrg] = useState<Organization | null>(organizations[0]);
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [activeOrg, setActiveOrg] = useState<Organization | null>(null);
+
+    const fetchOrganizations = async () => {
+        try {
+            const response = await fetch("http://localhost:8000/organizations/");
+            if (response.ok) {
+                const data = await response.json();
+                setOrganizations(data);
+                if (data.length > 0 && !activeOrg) {
+                    setActiveOrg(data[0]);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch organizations:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchOrganizations();
+    }, []);
 
     const createOrg = async (name: string) => {
-        // In future, this will call the FastAPI backend
-        const newOrg = { id: Math.random().toString(), name };
-        setOrganizations([...organizations, newOrg]);
-        setActiveOrg(newOrg);
+        try {
+            const response = await fetch("http://localhost:8000/organizations/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name }),
+            });
+            if (response.ok) {
+                const newOrg = await response.json();
+                setOrganizations((prev) => [...prev, newOrg]);
+                setActiveOrg(newOrg);
+            }
+        } catch (error) {
+            console.error("Failed to create organization:", error);
+        }
     };
 
     return (

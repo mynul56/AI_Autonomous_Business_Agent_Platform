@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useOrganization } from "./use-organization";
 
 export interface Agent {
     id: string;
@@ -13,37 +14,65 @@ export interface Agent {
 
 interface AgentContextType {
     agents: Agent[];
-    addAgent: (agent: Omit<Agent, "id" | "createdAt" | "status">) => void;
-    deleteAgent: (id: string) => void;
-    updateAgent: (id: string, agent: Partial<Agent>) => void;
+    addAgent: (agent: Omit<Agent, "id" | "createdAt" | "status">) => Promise<void>;
+    deleteAgent: (id: string) => Promise<void>;
+    updateAgent: (id: string, agent: Partial<Agent>) => Promise<void>;
 }
 
 const AgentContext = createContext<AgentContextType | undefined>(undefined);
 
-const INITIAL_AGENTS: Agent[] = [
-    { id: "1", name: "Sales Assistant", role: "Lead Qualification", prompt: "You are a sales assistant...", status: "Active", createdAt: new Date().toISOString() },
-    { id: "2", name: "Support Bot", role: "Customer Support (Web)", prompt: "You are a customer support agent...", status: "Active", createdAt: new Date().toISOString() },
-    { id: "3", name: "Content Planner", role: "Social Marketing", prompt: "You are a marketing strategist...", status: "Idle", createdAt: new Date().toISOString() },
-];
-
 export function AgentProvider({ children }: { children: React.ReactNode }) {
-    const [agents, setAgents] = useState<Agent[]>(INITIAL_AGENTS);
+    const [agents, setAgents] = useState<Agent[]>([]);
+    const { activeOrg } = useOrganization();
 
-    const addAgent = (agentData: Omit<Agent, "id" | "createdAt" | "status">) => {
-        const newAgent: Agent = {
-            ...agentData,
-            id: Math.random().toString(36).substr(2, 9),
-            status: "Idle",
-            createdAt: new Date().toISOString(),
-        };
-        setAgents((prev) => [newAgent, ...prev]);
+    const fetchAgents = async () => {
+        if (!activeOrg) return;
+        try {
+            const response = await fetch(`http://localhost:8000/agents/${activeOrg.id}`);
+            if (response.ok) {
+                const data = await response.json();
+                setAgents(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch agents:", error);
+        }
     };
 
-    const deleteAgent = (id: string) => {
-        setAgents((prev) => prev.filter((a) => a.id !== id));
+    useEffect(() => {
+        fetchAgents();
+    }, [activeOrg]);
+
+    const addAgent = async (agentData: Omit<Agent, "id" | "createdAt" | "status">) => {
+        if (!activeOrg) return;
+        try {
+            const response = await fetch("http://localhost:8000/agents/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...agentData, organization_id: activeOrg.id }),
+            });
+            if (response.ok) {
+                fetchAgents();
+            }
+        } catch (error) {
+            console.error("Failed to add agent:", error);
+        }
     };
 
-    const updateAgent = (id: string, agentData: Partial<Agent>) => {
+    const deleteAgent = async (id: string) => {
+        try {
+            const response = await fetch(`http://localhost:8000/agents/${id}`, {
+                method: "DELETE",
+            });
+            if (response.ok) {
+                fetchAgents();
+            }
+        } catch (error) {
+            console.error("Failed to delete agent:", error);
+        }
+    };
+
+    const updateAgent = async (id: string, agentData: Partial<Agent>) => {
+        // Implement backend update if needed, otherwise just optimistic update
         setAgents((prev) => prev.map((a) => (a.id === id ? { ...a, ...agentData } : a)));
     };
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import { OrganizationProvider } from "@/hooks/use-organization";
 import { AgentProvider } from "@/hooks/use-agents";
 import { TeamProvider } from "@/hooks/use-team";
+import { KnowledgeProvider } from "@/hooks/use-knowledge";
+import { ConversationProvider } from "@/hooks/use-conversations";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +35,11 @@ export default function RootLayout({
         <OrganizationProvider>
           <AgentProvider>
             <TeamProvider>
-              {children}
+              <KnowledgeProvider>
+                <ConversationProvider>
+                  {children}
+                </ConversationProvider>
+              </KnowledgeProvider>
             </TeamProvider>
           </AgentProvider>
         </OrganizationProvider>
